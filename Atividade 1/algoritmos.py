@@ -1,3 +1,5 @@
+
+
 #TODOS OS ALGORITMOS IMPLEMENTADOS
 
 #BUBBLESORT
@@ -193,9 +195,9 @@ def run_experiments(inc, fim, stp, rpt):
 
 
 # Parâmetros dos experimentos
-inc = 100  # tamanho inicial
-fim = 1000  # tamanho final
-stp = 100  # intervalo entre dois tamanhos
+inc = 1000  # tamanho inicial
+fim = 20000  # tamanho final
+stp = 1000  # intervalo entre dois tamanhos
 rpt = 3  # número de repetições
 
 # Executar os experimentos
