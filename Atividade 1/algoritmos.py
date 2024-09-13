@@ -94,20 +94,19 @@ def partition(arr, low, high):
             i = i + 1
             arr[i], arr[j] = arr[j], arr[i]
 
-    arr[i+1], arr[high] = arr[high], arr[i+1]
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
     return i + 1
 
 def quick_sort(arr, low, high):
-    def _quick_sort(arr, low, high):
-        if low < high:
-            pi = partition(arr, low, high)
-            _quick_sort(arr, low, pi - 1)
-            _quick_sort(arr, pi + 1, high)
+    if low < high:  # Verifica se os índices estão dentro dos limites válidos
+        def _quick_sort(arr, low, high):
+            if low < high:
+                pi = partition(arr, low, high)
+                _quick_sort(arr, low, pi - 1)
+                _quick_sort(arr, pi + 1, high)
 
-    _quick_sort(arr, low, high)
+        _quick_sort(arr, low, high)
     return arr
-
-
 
 #COUNTING SORT
 def counting_sort(arr):
@@ -139,24 +138,31 @@ import time
 # ...
 
 def generate_random_vector(n):
-    return [random.randint(0, 10000) for _ in range(n)]
+    """Gera um vetor de tamanho n com números (pseudo)aleatórios que variam de 0 a n. """
+    return [random.randint(0, n) for _ in range(n)] # Para cada posição no tamanho n, gera um número (pseudo)aleatório entre 0 e n^2
 
 def generate_reverse_vector(n):
-    return sorted(generate_random_vector(n), reverse=True)
+    """Gera um vetor de tamanho n com os números de n a 1. (decrescente)"""
+    return list(range(n, 0, -1)) #
+    # return sorted(generate_random_vector(n), reverse=True) @amanda
 
 def generate_sorted_vector(n):
-    return sorted(generate_random_vector(n))
+    """Gera um vetor de tamanho n com os números de 1 a n. (crescente)"""
+    return list(range(1, n+1))
+    # return sorted(generate_random_vector(n))
 
 def generate_nearly_sorted_vector(n):
-    arr = generate_sorted_vector(n)
-    num_swaps = max(1, n // 10)  # Embaralha 10% do vetor
+    """Gera um vetor de tamanho n com os números (pseudo)aleatórios ordenado e embaralha 10% de seus elementos. Como dito no relatório, é esperado que o tamanho n do vetor seja maior que 1. Isso se dá pois o algoritmo random.sample() não aceita um uma população menor que a amostra. Uma alternativa seria deixar embaralhando apenas 10%, entretanto, para valores de n até 10, o vetor não seria parcialmente embaralhado. """
+    arr = generate_random_vector(n)
+    arr.sort()
+    num_swaps = max(1, n // 10)  # Conta quantas trocas serão feitas (embaralhamento de 10%), mínimo 1, pois senão é um vetor ordenado.
     for _ in range(num_swaps):
-        i = random.randint(0, n-1)
-        j = random.randint(0, n-1)
+        i, j = random.sample(range(n), 2) # sample() garante que não serão selecionados os mesmos indices de 0 a n-1.
         arr[i], arr[j] = arr[j], arr[i]
     return arr
 
 def time_sorting_algorithm(algorithm, arr):
+    """Passa o nome de uma função como parâmetro e retorna o tempo que ela leva para ordenar um vetor."""
     start_time = time.time()
     if algorithm == quick_sort:
         # Para quick_sort, passamos o array com índices
@@ -164,13 +170,14 @@ def time_sorting_algorithm(algorithm, arr):
     else:
         # Para outros algoritmos, usamos o array copiado
         algorithm(arr.copy())
-    return time.time() - start_time
+    return time.time() - start_time # retorna o tempo do fim - tempo do inicio do algoritmo
 
 
 def run_experiments(inc, fim, stp, rpt):
     algorithms = [bubble_sort, insertion_sort, merge_sort, heap_sort, quick_sort, counting_sort]
     algorithm_names = ["BubbleSort", "InsertionSort", "MergeSort", "HeapSort", "QuickSort", "CountingSort"]
 
+    # para cada tipo de conjunto de dados, chama uma função diferente
     for data_type, generator in [
         ("[[RANDOM]]", generate_random_vector),
         ("[[REVERSE]]", generate_reverse_vector),
@@ -178,7 +185,11 @@ def run_experiments(inc, fim, stp, rpt):
         ("[[NEARLY SORTED]]", generate_nearly_sorted_vector),
     ]:
         print(data_type)
-        print("n", *algorithm_names)
+        print("n          ", end=" ")
+        for name in algorithm_names:
+            print(f"{name:13}", end=" ")
+        print()
+        # print("n", *algorithm_names)
         for n in range(inc, fim + 1, stp):
             times = []
             for algorithm in algorithms:
@@ -191,14 +202,18 @@ def run_experiments(inc, fim, stp, rpt):
                         total_time += time_sorting_algorithm(algorithm, arr.copy())
                 avg_time = total_time / rpt
                 times.append(avg_time)
-            print(n, *times)
+            print(f"{n:<6}", end=" ")
+            for time in times:
+                print(f"{time:13.6f}", end=" ")
+            print()
+        print()
 
 
 # Parâmetros dos experimentos
-inc = 1000  # tamanho inicial
-fim = 20000  # tamanho final
-stp = 1000  # intervalo entre dois tamanhos
-rpt = 3  # número de repetições
+inc = 100  # tamanho inicial
+fim = 1100  # tamanho final
+stp = 200  # intervalo entre dois tamanhos
+rpt = 1  # número de repetições
 
 # Executar os experimentos
 run_experiments(inc, fim, stp, rpt)
