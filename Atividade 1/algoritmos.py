@@ -87,31 +87,37 @@ def heap_sort(arr):
 
 #QUICKSORT (SEPARA)
 def partition(arr, low, high):
-    pivot = arr[high-1]
-    i = low 
-
-    for j in range(low, high - 1):
+    """ função partition para o quicksort com algumas alterações visando eficiência e amenizar pior caso """ 
+    # estipula elemento do meio como pivo
+    mid = (low + high) // 2
+    pivot = arr[mid]
+    
+    # e move o pivo para o final
+    arr[mid], arr[high] = arr[high], arr[mid]
+    
+    i = low
+    for j in range(low, high):
         if arr[j] <= pivot:
             arr[i], arr[j] = arr[j], arr[i]
-            i = i + 1
-
-    arr[i], arr[high-1] = arr[high-1], arr[i]
+            i += 1
+    
+    arr[i], arr[high] = arr[high], arr[i]
     return i
 
-def quick_sort(arr, low = 0, high = None):
-    if fim is not None:
-        high = high
-    else:
-        high = len(arr)
+def quick_sort(arr, low=0, high=None):
+    """ esta função ordena o vetor arr utilizando o algoritmo quicksort. neste caso, há uma função encapsulada que é responsável pelas recursões que ordenarão as partições do vetor. """
+    if high is None:
+        high = len(arr) - 1
     
-    if low < high - 1:  # Verifica se os índices estão dentro dos limites válidos
-        def _quick_sort(arr, low, high):
-            if low < high:
-                pi = partition(arr, low, high)
-                _quick_sort(arr, low, pi - 1)
-                _quick_sort(arr, pi + 1, high)
-
-        _quick_sort(arr, low, high)
+    def _quick_sort(arr, low, high):
+        # definição da função. lida com os limites do vetor de maneira mais clara
+        if low < high:
+            pi = partition(arr, low, high)
+            _quick_sort(arr, low, pi - 1)
+            _quick_sort(arr, pi + 1, high)
+    
+    # primeira chamada da função recursiva
+    _quick_sort(arr, low, high)
     return arr
 
 #COUNTING SORT
@@ -172,17 +178,15 @@ def time_sorting_algorithm(algorithm, arr):
     start_time = time.time()
     if algorithm == quick_sort:
         # Para quick_sort, passamos o array com índices
-        algorithm(arr, 0, len(arr) - 1)
+        algorithm(arr)
     else:
         # Para outros algoritmos, usamos o array copiado
         algorithm(arr.copy())
     return time.time() - start_time # retorna o tempo do fim - tempo do inicio do algoritmo
 
-
 def run_experiments(inc, fim, stp, rpt):
     algorithms = [bubble_sort, insertion_sort, merge_sort, heap_sort, quick_sort, counting_sort]
     algorithm_names = ["BubbleSort", "InsertionSort", "MergeSort", "HeapSort", "QuickSort", "CountingSort"]
-
     # para cada tipo de conjunto de dados, chama uma função diferente
     for data_type, generator in [
         ("[[RANDOM]]", generate_random_vector),
@@ -214,7 +218,6 @@ def run_experiments(inc, fim, stp, rpt):
                 print(f"{time:13.6f}", end=" ")
             print()
         print()
-
 
 # Parâmetros dos experimentos
 inc = 1000  # tamanho inicial
