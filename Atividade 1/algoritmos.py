@@ -1,4 +1,5 @@
-
+# AVALIAÇÃO 1 - IMPLEMENTAÇÃO ALGORÍTMICA
+# Alunos: Amanda Gois e Guilherme Fiani
 
 #TODOS OS ALGORITMOS IMPLEMENTADOS
 
@@ -86,19 +87,24 @@ def heap_sort(arr):
 
 #QUICKSORT (SEPARA)
 def partition(arr, low, high):
-    pivot = arr[high]
-    i = low - 1
+    pivot = arr[high-1]
+    i = low 
 
-    for j in range(low, high):
+    for j in range(low, high - 1):
         if arr[j] <= pivot:
-            i = i + 1
             arr[i], arr[j] = arr[j], arr[i]
+            i = i + 1
 
-    arr[i + 1], arr[high] = arr[high], arr[i + 1]
-    return i + 1
+    arr[i], arr[high-1] = arr[high-1], arr[i]
+    return i
 
-def quick_sort(arr, low, high):
-    if low < high:  # Verifica se os índices estão dentro dos limites válidos
+def quick_sort(arr, low = 0, high = None):
+    if fim is not None:
+        high = high
+    else:
+        high = len(arr)
+    
+    if low < high - 1:  # Verifica se os índices estão dentro dos limites válidos
         def _quick_sort(arr, low, high):
             if low < high:
                 pi = partition(arr, low, high)
@@ -194,6 +200,7 @@ def run_experiments(inc, fim, stp, rpt):
             times = []
             for algorithm in algorithms:
                 total_time = 0
+                # if data_type == "[[RANDOM]]" faz rpt vetores diferentes
                 for _ in range(rpt):
                     arr = generator(n)
                     if algorithm == quick_sort:
@@ -210,10 +217,10 @@ def run_experiments(inc, fim, stp, rpt):
 
 
 # Parâmetros dos experimentos
-inc = 100  # tamanho inicial
-fim = 1100  # tamanho final
-stp = 200  # intervalo entre dois tamanhos
-rpt = 1  # número de repetições
+inc = 1000  # tamanho inicial
+fim = 5000  # tamanho final
+stp = 500  # intervalo entre dois tamanhos
+rpt = 3  # número de repetições
 
 # Executar os experimentos
 run_experiments(inc, fim, stp, rpt)
