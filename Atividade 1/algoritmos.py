@@ -1,8 +1,12 @@
 # AVALIAÇÃO 1 - IMPLEMENTAÇÃO ALGORÍTMICA
 # Alunos: Amanda Gois e Guilherme Fiani
 
-#TODOS OS ALGORITMOS IMPLEMENTADOS
+# importando bibliotecas
+import matplotlib.pyplot as plt
+import random
+import time
 
+#TODOS OS ALGORITMOS IMPLEMENTADOS
 #BUBBLESORT
 def bubble_sort(arr):
     n = len(arr)
@@ -22,7 +26,6 @@ def insertion_sort(arr):
             j -= 1
         arr[j+1] = key
     return arr
-
 
 #MERGESORT
 def merge_sort(arr):
@@ -56,7 +59,6 @@ def merge_sort(arr):
             k += 1
     return arr
 
-
 #HEAP SORT (ORGANIZAÇÃO)
 def heapify(arr, n, i):
     largest = i
@@ -83,7 +85,6 @@ def heap_sort(arr):
         arr[i], arr[0] = arr[0], arr[i]
         heapify(arr, i, 0)
     return arr
-
 
 #QUICKSORT (SEPARA)
 def partition(arr, low, high):
@@ -143,12 +144,7 @@ def counting_sort(arr):
 
     return arr
 
-import random
-import time
-
-# Implementação dos algoritmos (já fornecidos anteriormente)
-# ...
-
+# Implementação dos geradores dos conjuntos de dados
 def generate_random_vector(n):
     """Gera um vetor de tamanho n com números (pseudo)aleatórios que variam de 0 a n. """
     return [random.randint(0, n) for _ in range(n)] # Para cada posição no tamanho n, gera um número (pseudo)aleatório entre 0 e n^2
@@ -185,8 +181,13 @@ def time_sorting_algorithm(algorithm, arr):
     return time.time() - start_time # retorna o tempo do fim - tempo do inicio do algoritmo
 
 def run_experiments(inc, fim, stp, rpt):
-    algorithms = [bubble_sort, insertion_sort, merge_sort, heap_sort, quick_sort, counting_sort]
-    algorithm_names = ["BubbleSort", "InsertionSort", "MergeSort", "HeapSort", "QuickSort", "CountingSort"]
+    """função principal do programa, que executa os testa os algoritmos sob os vetores conforme as condições do trabalho e gera os gráficos."""
+    elementary_algorithms = [bubble_sort, insertion_sort]
+    efficient_algorithms = [merge_sort, heap_sort, quick_sort, counting_sort]
+    all_algorithms = elementary_algorithms + efficient_algorithms
+    elementary_names = ["BubbleSort", "InsertionSort"]
+    efficient_names = ["MergeSort", "HeapSort", "QuickSort", "CountingSort"]
+    all_names = elementary_names + efficient_names
     
     for data_type, generator in [
         ("[[RANDOM]]", generate_random_vector),
@@ -196,40 +197,75 @@ def run_experiments(inc, fim, stp, rpt):
     ]:
         print(data_type)
         print("n          ", end=" ")
-        for name in algorithm_names:
+        for name in all_names:
             print(f"{name:13}", end=" ")
         print()
         
         n_values = list(range(inc, fim + 1, stp))
-        times = [[0 for _ in algorithms] for _ in n_values]  # Initialize the time matrix
+        all_times = [[0 for _ in all_algorithms] for _ in n_values]
         
-        # laço de repetição que itera o i em 1, e n seguindo inc, fim, stp.
         for i, n in enumerate(n_values):
-            # se o conjunto de dado for [[RANDOM]], então rpt vetores sao gerados aleatoriamente e ordenados com cada algoritmo
             if data_type == "[[RANDOM]]":
-                for j, algorithm in enumerate(algorithms):
+                for j, algorithm in enumerate(all_algorithms):
                     total_time = 0
-                    # para cada repetição, gera um vetor aleatório e ordena com o algoritmo em questão.
                     for _ in range(rpt):
                         arr = generator(n)
                         total_time += time_sorting_algorithm(algorithm, arr.copy())
-                    times[i][j] = total_time / rpt
+                    all_times[i][j] = total_time / rpt
             else:
-                # se o conjunto de dados for diferente de [[RANDOM]], há apenas uma execução de cada algoritmo (1 vetor apenas)
                 arr = generator(n)
-                for j, algorithm in enumerate(algorithms):
-                    times[i][j] = time_sorting_algorithm(algorithm, arr.copy())
+                for j, algorithm in enumerate(all_algorithms):
+                    all_times[i][j] = time_sorting_algorithm(algorithm, arr.copy())
             
             print(f"{n:<6}", end=" ")
-            for time in times[i]:
+            for time in all_times[i]:
                 print(f"{time:13.6f}", end=" ")
             print()
         print()
+        
+        # gera graficos para todos os algoritmos, algoritmos elementares e algoritmos eficientes.
+        plt.figure(figsize=(12, 6))
+        for j, name in enumerate(all_names):
+            plt.plot(n_values, [all_times[i][j] for i in range(len(n_values))], label=name)
+        
+        plt.title(f"Todos Algoritmos de Ordenação - {data_type}")
+        plt.xlabel("Entrada (n)")
+        plt.ylabel("Tempo (segundos)")
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(f"algoritmos_ordenacao{data_type.replace('[[', '').replace(']]', '').lower()}.png")
+        plt.tight_layout()
+        plt.close()
+
+        # Generate separate graphs for elementary and efficient algorithms
+        plt.figure(figsize=(12, 6))
+        for j, name in enumerate(elementary_names):
+            plt.plot(n_values, [all_times[i][j] for i in range(len(n_values))], label=name)
+        
+        plt.title(f"Algoritmos Elementares - {data_type}")
+        plt.xlabel("Entrada (n)")
+        plt.ylabel("Tempo (segundos)")
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(f"algoritmos_elementares_{data_type.replace('[[', '').replace(']]', '').lower()}.png")
+        plt.close()
+
+        plt.figure(figsize=(12, 6))
+        for j, name in enumerate(efficient_names):
+            plt.plot(n_values, [all_times[i][j+len(elementary_algorithms)] for i in range(len(n_values))], label=name)
+        
+        plt.title(f"Algoritmos Eficientes - {data_type}")
+        plt.xlabel("Entrada (n)")
+        plt.ylabel("Tempo (segundos)")
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(f"algoritmos_eficientes_{data_type.replace('[[', '').replace(']]', '').lower()}.png")
+        plt.close()
 
 # Parâmetros dos experimentos
 inc = 1000  # tamanho inicial
-fim = 5000  # tamanho final
-stp = 500  # intervalo entre dois tamanhos
+fim = 20000  # tamanho final
+stp = 1000  # intervalo entre dois tamanhos
 rpt = 3  # número de repetições
 
 # Executar os experimentos
