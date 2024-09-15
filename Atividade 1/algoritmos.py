@@ -195,28 +195,34 @@ def run_experiments(inc, fim, stp, rpt):
         ("[[SORTED]]", generate_sorted_vector),
         ("[[NEARLY SORTED]]", generate_nearly_sorted_vector),
     ]:
+        # cabeçalho da tabela
         print(data_type)
         print("n          ", end=" ")
         for name in all_names:
             print(f"{name:13}", end=" ")
-        print()
+        print("\n------------------------------------------------------------------------------------------------")
         
+        # criação da tabela
         n_values = list(range(inc, fim + 1, stp))
         all_times = [[0 for _ in all_algorithms] for _ in n_values]
         
         for i, n in enumerate(n_values):
+            # se for conjunto de dado tipo aleatório
             if data_type == "[[RANDOM]]":
                 for j, algorithm in enumerate(all_algorithms):
                     total_time = 0
+                    # testa o algoritmo para rpt vetores e tira a média
                     for _ in range(rpt):
                         arr = generator(n)
                         total_time += time_sorting_algorithm(algorithm, arr.copy())
                     all_times[i][j] = total_time / rpt
             else:
+                # outros conjuntos de dados executam apenas 1 vez
                 arr = generator(n)
                 for j, algorithm in enumerate(all_algorithms):
                     all_times[i][j] = time_sorting_algorithm(algorithm, arr.copy())
             
+            # impressão da linha da tabela
             print(f"{n:<6}", end=" ")
             for time in all_times[i]:
                 print(f"{time:13.6f}", end=" ")
