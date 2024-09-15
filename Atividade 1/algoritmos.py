@@ -187,7 +187,7 @@ def time_sorting_algorithm(algorithm, arr):
 def run_experiments(inc, fim, stp, rpt):
     algorithms = [bubble_sort, insertion_sort, merge_sort, heap_sort, quick_sort, counting_sort]
     algorithm_names = ["BubbleSort", "InsertionSort", "MergeSort", "HeapSort", "QuickSort", "CountingSort"]
-    # para cada tipo de conjunto de dados, chama uma função diferente
+    
     for data_type, generator in [
         ("[[RANDOM]]", generate_random_vector),
         ("[[REVERSE]]", generate_reverse_vector),
@@ -199,22 +199,29 @@ def run_experiments(inc, fim, stp, rpt):
         for name in algorithm_names:
             print(f"{name:13}", end=" ")
         print()
-        # print("n", *algorithm_names)
-        for n in range(inc, fim + 1, stp):
-            times = []
-            for algorithm in algorithms:
-                total_time = 0
-                # if data_type == "[[RANDOM]]" faz rpt vetores diferentes
-                for _ in range(rpt):
-                    arr = generator(n)
-                    if algorithm == quick_sort:
-                        total_time += time_sorting_algorithm(algorithm, arr)
-                    else:
+        
+        n_values = list(range(inc, fim + 1, stp))
+        times = [[0 for _ in algorithms] for _ in n_values]  # Initialize the time matrix
+        
+        # laço de repetição que itera o i em 1, e n seguindo inc, fim, stp.
+        for i, n in enumerate(n_values):
+            # se o conjunto de dado for [[RANDOM]], então rpt vetores sao gerados aleatoriamente e ordenados com cada algoritmo
+            if data_type == "[[RANDOM]]":
+                for j, algorithm in enumerate(algorithms):
+                    total_time = 0
+                    # para cada repetição, gera um vetor aleatório e ordena com o algoritmo em questão.
+                    for _ in range(rpt):
+                        arr = generator(n)
                         total_time += time_sorting_algorithm(algorithm, arr.copy())
-                avg_time = total_time / rpt
-                times.append(avg_time)
+                    times[i][j] = total_time / rpt
+            else:
+                # se o conjunto de dados for diferente de [[RANDOM]], há apenas uma execução de cada algoritmo (1 vetor apenas)
+                arr = generator(n)
+                for j, algorithm in enumerate(algorithms):
+                    times[i][j] = time_sorting_algorithm(algorithm, arr.copy())
+            
             print(f"{n:<6}", end=" ")
-            for time in times:
+            for time in times[i]:
                 print(f"{time:13.6f}", end=" ")
             print()
         print()
